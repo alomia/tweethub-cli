@@ -25,9 +25,29 @@ Examples:
 	Run: func(cmd *cobra.Command, args []string) {
 		switch {
 		case undo:
+			if allAccounts {
+				for _, user := range accounts {
+					tweetHub.SetUsername(user.Username)
+					tweetHub.SetPassword(user.Password)
+
+					cancel := tweetHub.UnLike(url)
+					defer cancel()
+				}
+				return
+			}
 			cancel := tweetHub.UnLike(url)
 			defer cancel()
 		default:
+			if allAccounts {
+				for _, user := range accounts {
+					tweetHub.SetUsername(user.Username)
+					tweetHub.SetPassword(user.Password)
+
+					cancel := tweetHub.Like(url)
+					defer cancel()
+				}
+				return
+			}
 			cancel := tweetHub.Like(url)
 			defer cancel()
 		}
@@ -37,7 +57,7 @@ Examples:
 func init() {
 	likeCmd.Flags().StringVar(&url, "url", "", "Specify the URL of the tweet.")
 	likeCmd.Flags().BoolVar(&undo, "undo", false, "Undo the like action (unlike).")
-	likeCmd.Flags().BoolVar(&allAccounts, "all-accounts", false, "Perform the action across all linked accounts.")
+	likeCmd.Flags().BoolVar(&allAccounts, "all-accounts", false, "Use all accounts")
 
 	likeCmd.MarkFlagRequired("url")
 
