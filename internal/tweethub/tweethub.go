@@ -206,6 +206,7 @@ func (t TweetHub) Repost(postURL string) context.CancelFunc {
 
 	retweetButtonSelector := `//div[2]/div[@data-testid="retweet"]`
 	unretweetButtonSelector := `//div[2]/div[@data-testid="unretweet"]`
+	repostButtonSelector := `//div[2]/div/div/div/div[2]/div/div[3]/div/div/div/div[@data-testid="retweetConfirm"]`
 
 	ctx, cancel := t.Login()
 
@@ -214,7 +215,8 @@ func (t TweetHub) Repost(postURL string) context.CancelFunc {
 
 		chromedp.WaitVisible(retweetButtonSelector, chromedp.BySearch),
 		chromedp.Click(retweetButtonSelector, chromedp.BySearch, chromedp.NodeVisible),
-		chromedp.KeyEvent(kb.Enter),
+		chromedp.WaitVisible(repostButtonSelector, chromedp.BySearch),
+		chromedp.Click(repostButtonSelector, chromedp.BySearch, chromedp.NodeVisible),
 
 		chromedp.WaitVisible(unretweetButtonSelector, chromedp.BySearch),
 	)
@@ -233,6 +235,7 @@ func (t TweetHub) UnRepost(postURL string) context.CancelFunc {
 
 	retweetButtonSelector := `//div[2]/div[@data-testid="retweet"]`
 	unretweetButtonSelector := `//div[2]/div[@data-testid="unretweet"]`
+	unrepostButtonSelector := `///div[2]/div/div/div/div[2]/div/div[3]/div/div/div/div[@data-testid="unretweetConfirm"]`
 
 	ctx, cancel := t.Login()
 
@@ -241,7 +244,8 @@ func (t TweetHub) UnRepost(postURL string) context.CancelFunc {
 
 		chromedp.WaitVisible(unretweetButtonSelector, chromedp.BySearch),
 		chromedp.Click(unretweetButtonSelector, chromedp.BySearch, chromedp.NodeVisible),
-		chromedp.KeyEvent(kb.Enter),
+		chromedp.WaitVisible(unrepostButtonSelector, chromedp.BySearch),
+		chromedp.Click(unrepostButtonSelector, chromedp.BySearch, chromedp.NodeVisible),
 
 		chromedp.WaitVisible(retweetButtonSelector, chromedp.BySearch),
 	)

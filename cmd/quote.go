@@ -16,14 +16,26 @@ Examples:
 - Quote a tweet with a custom message:
   tweethub quote --url <tweet-url> --message "Your custom message here"`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cancel := tweetHub.Quote(url, message)
-		defer cancel()
+		switch {
+		case allAccounts:
+			for _, user := range accounts {
+				tweetHub.SetUsername(user.Username)
+				tweetHub.SetPassword(user.Password)
+
+				cancel := tweetHub.Quote(url, message)
+				defer cancel()
+			}
+		default:
+			cancel := tweetHub.Quote(url, message)
+			defer cancel()
+		}
 	},
 }
 
 func init() {
 	quoteCmd.Flags().StringVarP(&message, "message", "m", "", "Specify a custom message for the quoted tweet.")
 	quoteCmd.Flags().StringVar(&url, "url", "", "Specify the URL of the tweet to be quoted.")
+	quoteCmd.Flags().BoolVar(&allAccounts, "all-accounts", false, "Use all accounts")
 
 	quoteCmd.MarkFlagRequired("url")
 

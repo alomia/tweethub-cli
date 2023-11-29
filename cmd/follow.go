@@ -21,9 +21,29 @@ Examples:
 	Run: func(cmd *cobra.Command, args []string) {
 		switch {
 		case undo:
+			if allAccounts {
+				for _, user := range accounts {
+					tweetHub.SetUsername(user.Username)
+					tweetHub.SetPassword(user.Password)
+
+					cancel := tweetHub.UnFollow(username)
+					defer cancel()
+				}
+				return
+			}
 			cancel := tweetHub.UnFollow(username)
 			defer cancel()
 		default:
+			if allAccounts {
+				for _, user := range accounts {
+					tweetHub.SetUsername(user.Username)
+					tweetHub.SetPassword(user.Password)
+
+					cancel := tweetHub.Follow(username)
+					defer cancel()
+				}
+				return
+			}
 			cancel := tweetHub.Follow(username)
 			defer cancel()
 		}
@@ -33,6 +53,7 @@ Examples:
 func init() {
 	followCmd.Flags().StringVarP(&username, "username", "u", "", "Specify the target Twitter username.")
 	followCmd.Flags().BoolVar(&undo, "undo", false, "Undo the follow action (unfollow).")
+	followCmd.Flags().BoolVar(&allAccounts, "all-accounts", false, "Use all accounts")
 
 	followCmd.MarkFlagRequired("username")
 

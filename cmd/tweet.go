@@ -20,6 +20,16 @@ to quickly create a Cobra application.`,
 			cancel := tweetHub.UnTweet(url)
 			defer cancel()
 		default:
+			if allAccounts {
+				for _, user := range accounts {
+					tweetHub.SetUsername(user.Username)
+					tweetHub.SetPassword(user.Password)
+
+					cancel := tweetHub.Tweet(message)
+					defer cancel()
+				}
+				return
+			}
 			cancel := tweetHub.Tweet(message)
 			defer cancel()
 		}
@@ -30,6 +40,7 @@ func init() {
 	tweetCmd.Flags().StringVarP(&message, "message", "m", "", "Specify the content of the tweet.")
 	tweetCmd.Flags().BoolVar(&undo, "undo", false, "Delete the specified tweet.")
 	tweetCmd.Flags().StringVar(&url, "url", "", "Specify the URL of the tweet to be deleted.")
+	tweetCmd.Flags().BoolVar(&allAccounts, "all-accounts", false, "Use all accounts")
 
 	rootCmd.AddCommand(tweetCmd)
 }
