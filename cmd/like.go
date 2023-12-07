@@ -31,7 +31,7 @@ Examples:
 					tweetHub.SetPassword(user.Password)
 
 					cancel := tweetHub.UnLike(url)
-					defer cancel()
+					cancel()
 				}
 				return
 			}
@@ -44,7 +44,7 @@ Examples:
 					tweetHub.SetPassword(user.Password)
 
 					cancel := tweetHub.Like(url)
-					defer cancel()
+					cancel()
 				}
 				return
 			}

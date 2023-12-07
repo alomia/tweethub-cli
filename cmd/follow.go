@@ -27,7 +27,7 @@ Examples:
 					tweetHub.SetPassword(user.Password)
 
 					cancel := tweetHub.UnFollow(username)
-					defer cancel()
+					cancel()
 				}
 				return
 			}
@@ -40,7 +40,7 @@ Examples:
 					tweetHub.SetPassword(user.Password)
 
 					cancel := tweetHub.Follow(username)
-					defer cancel()
+					cancel()
 				}
 				return
 			}
