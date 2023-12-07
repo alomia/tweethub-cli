@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/alomia/tweethub-cli/internal/tweethub"
 	"github.com/spf13/cobra"
@@ -15,27 +16,37 @@ type Account struct {
 }
 
 var (
+	cfgFile     string
 	username    string
 	message     string
 	url         string
 	undo        bool
+	random      bool
 	allAccounts bool
+	useMessages bool
 
 	accounts []Account
 	tweetHub *tweethub.TweetHub
-	cfgFile  = "tweethub.yaml"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "tweethub-cli",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "A CLI tool for managing Twitter accounts and tweets.",
+	Long: `Tweethub-CLI is a command-line interface (CLI) application designed for managing Twitter accounts and tweets efficiently.
+It leverages the Cobra library in Go to provide a powerful and flexible user experience.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+With Tweethub-CLI, you can perform various Twitter-related tasks, such as tweeting messages, deleting tweets, and managing multiple accounts.
+
+Examples:
+  - Tweet a message: tweethub-cli tweet -m "Hello, world!"
+  - Delete a tweet: tweethub-cli tweet --undo --url <tweet-url>
+  - Use predefined messages: tweethub-cli tweet --use-messages
+
+Explore the full range of features by checking the available commands and their respective options.
+
+Cobra is a CLI library for Go that empowers applications by providing a simple and elegant way to build powerful CLI tools.
+This application aims to simplify the interaction with Twitter through the command line, making it a valuable tool for developers and Twitter enthusiasts.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -51,25 +62,38 @@ func Execute() {
 }
 
 func init() {
-	initConfig()
+	cobra.OnInitialize(initConfig, func() {
+		if err := viper.UnmarshalKey("accounts", &accounts); err != nil {
+			fmt.Printf("Error unmarshaling config: %v\n", err)
+			os.Exit(1)
+		}
+	}, func() {
+		tweetHub = tweethub.New()
+		tweetHub.SetUsername(accounts[0].Username)
+		tweetHub.SetPassword(accounts[0].Password)
+	})
 
-	if err := viper.UnmarshalKey("accounts", &accounts); err != nil {
-		fmt.Printf("Error unmarshaling config: %v\n", err)
-		os.Exit(1)
-	}
-
-	tweetHub = tweethub.New()
-	tweetHub.SetUsername(accounts[0].Username)
-	tweetHub.SetPassword(accounts[0].Password)
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./tweethub.yaml)")
 }
 
 func initConfig() {
-	viper.AddConfigPath(".")
-	viper.SetConfigType("yaml")
-	viper.SetConfigName("tweethub")
+	baseDir, err := os.Getwd()
+	cobra.CheckErr(err)
+
+	fullPath := filepath.Join(baseDir, cfgFile)
+
+	if cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(fullPath)
+	} else {
+		viper.AddConfigPath(".")
+		viper.SetConfigType("yaml")
+		viper.SetConfigName("tweethub")
+	}
 
 	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("Error config file: The file %s does not exist in the directory\n", cfgFile)
-		return
+		cobra.CheckErr(fmt.Errorf("Error reading config file: %v", err))
 	}
+
+	fmt.Println("Using config file:", viper.ConfigFileUsed())
 }
