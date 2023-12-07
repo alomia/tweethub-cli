@@ -1,6 +1,6 @@
 # TweetHub-CLI
 
-tweethub es una herramienta de línea de comandos (CLI) que te permite interactuar con Twitter de manera automatizada. Utiliza un enfoque de navegación sin cabeza (headless browsing) con la biblioteca chromedp para realizar acciones como dar "like", "retweet", "citar", "seguir" y más.
+tweethub es una herramienta de línea de comandos (CLI) que te permite interactuar con Twitter de manera automatizada. Utiliza un enfoque de navegación sin cabeza (headless browsing) con la biblioteca chromedp para realizar acciones como dar "like", "retweet", "quote", "follow" y más.
 
 ## Uso
 
